@@ -147,7 +147,8 @@ def build_launch_command(
     elif vanilla.minecraft_arguments:
         argv.extend(_substitute(vanilla.minecraft_arguments, values).split())
 
-    argv.extend(loader.extra_game_arguments and _flatten_modern_args(loader.extra_game_arguments, values) or [])
+    if loader.extra_game_arguments:
+        argv.extend(_flatten_modern_args(loader.extra_game_arguments, values))
 
     argv.extend(["--width", str(settings.window_width)])
     argv.extend(["--height", str(settings.window_height)])

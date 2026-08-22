@@ -156,6 +156,18 @@ def _run_installer(
 
     mc_root = instance_root / "minecraft"
     mc_root.mkdir(parents=True, exist_ok=True)
+
+    versions_dir = mc_root / "versions"
+    generated_profiles = [
+        path
+        for path in versions_dir.glob("*/*.json")
+        if "forge" in path.stem.lower()
+        and installer_filename.removesuffix("-installer.jar").lower()
+        in path.stem.lower()
+    ] if versions_dir.exists() else []
+    if generated_profiles:
+        return sorted(generated_profiles)[-1]
+
     launcher_profiles = mc_root / "launcher_profiles.json"
     if not launcher_profiles.exists():
         launcher_profiles.write_text(json.dumps({"profiles": {}}), encoding="utf-8")
@@ -176,7 +188,6 @@ def _run_installer(
             f"Installer output: {(result.stderr or result.stdout).strip()[-2000:]}"
         )
 
-    versions_dir = mc_root / "versions"
     candidates = list(versions_dir.glob("*/*.json")) if versions_dir.exists() else []
     if not candidates:
         raise LoaderInstallError(

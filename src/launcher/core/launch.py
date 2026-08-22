@@ -21,6 +21,7 @@ from launcher.auth.models import Account, AccountType
 from launcher.core.instance import Instance
 from launcher.core.loader_installer import LoaderProfile, install_loader
 from launcher.core.vanilla_installer import VanillaVersionInfo, install_vanilla_version
+from launcher.util.paths import libraries_dir
 
 logger = logging.getLogger(__name__)
 
@@ -114,7 +115,7 @@ def build_launch_command(
         "launcher_version": "0.1.0",
         "classpath": _classpath_separator().join(classpath),
         "classpath_separator": _classpath_separator(),
-        "library_directory": str(vanilla.natives_dir.parent),
+        "library_directory": str(libraries_dir()),
     }
 
     argv: list[str] = [str(java_binary)]

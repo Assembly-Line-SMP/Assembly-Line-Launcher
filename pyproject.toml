@@ -1,0 +1,49 @@
+[project]
+name = "assembly-line-launcher"
+version = "0.1.0"
+description = "Custom Minecraft launcher for the Assembly Line SMP (Modrinth), supporting cracked and premium accounts"
+readme = "README.md"
+requires-python = ">=3.11"
+license = { text = "MIT" }
+authors = [{ name = "Pavle012" }]
+
+dependencies = [
+    "PySide6>=6.7,<7.0",
+    "httpx>=0.27,<1.0",
+    "keyring>=25.0,<26.0",
+]
+
+[project.optional-dependencies]
+dev = [
+    "pytest>=8.0",
+    "pytest-mock>=3.14",
+    "ruff>=0.6",
+    "nuitka>=2.4",
+]
+
+[project.scripts]
+assembly-line-launcher = "launcher.app:main"
+
+[tool.ruff]
+line-length = 100
+target-version = "py311"
+src = ["src"]
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "UP", "B", "SIM"]
+# E501: line length is handled by formatting, not worth failing CI over.
+# UP042: str+Enum (not StrEnum) is used deliberately for JSON round-trip
+# clarity in the account model; StrEnum's repr differs in ways that would
+# leak into stored account files.
+ignore = ["E501", "UP042"]
+
+[tool.pytest.ini_options]
+pythonpath = ["src"]
+testpaths = ["tests"]
+
+[build-system]
+requires = ["setuptools>=68", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[tool.setuptools.packages.find]
+where = ["src"]

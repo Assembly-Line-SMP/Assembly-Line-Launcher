@@ -1,0 +1,7 @@
+-r requirements.txt
+pytest>=8.0
+pytest-mock>=3.14
+ruff>=0.6
+nuitka>=2.4
+ordered-set>=4.1
+zstandard>=0.23

@@ -46,7 +46,7 @@ class DownloadTask:
 
 def _hash_matches(path: Path, sha1: str | None, sha512: str | None) -> bool:
     if not sha1 and not sha512:
-        return True
+        return path.is_file()
     if not path.exists():
         return False
 

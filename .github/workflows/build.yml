@@ -1,0 +1,125 @@
+name: Build
+
+on:
+  push:
+    branches: [main]
+    tags: ["v*"]
+  pull_request:
+    branches: [main]
+  workflow_dispatch: {}
+
+jobs:
+  lint-and-test:
+    name: Lint & Test
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+          cache: "pip"
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements-dev.txt
+
+      - name: Ruff lint
+        run: ruff check src tests
+
+      - name: Run tests
+        env:
+          QT_QPA_PLATFORM: offscreen
+        run: pytest -v
+
+  build:
+    name: Build (${{ matrix.os }})
+    needs: lint-and-test
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - os: ubuntu-latest
+            platform_name: linux
+            artifact_ext: ""
+          - os: windows-latest
+            platform_name: windows
+            artifact_ext: ".exe"
+          - os: macos-latest
+            platform_name: macos
+            artifact_ext: ""
+    runs-on: ${{ matrix.os }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+          cache: "pip"
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements-dev.txt
+
+      # patchelf is required by Nuitka's --standalone mode on Linux to fix
+      # up RPATHs in the bundled shared libraries.
+      - name: Install patchelf (Linux)
+        if: matrix.platform_name == 'linux'
+        run: sudo apt-get update && sudo apt-get install -y patchelf
+
+      # Qt needs a virtual display to import cleanly even for a build-time
+      # sanity check; harmless no-op on Windows/macOS runners which don't
+      # need it because they have a real (if headless) display server.
+      - name: Set headless Qt platform (Linux)
+        if: matrix.platform_name == 'linux'
+        run: echo "QT_QPA_PLATFORM=offscreen" >> "$GITHUB_ENV"
+
+      - name: Build with Nuitka
+        env:
+          # Release builds (tag pushes) get LTO for a smaller/faster binary;
+          # regular PR/branch builds skip it to keep CI turnaround short.
+          LAUNCHER_BUILD_LTO: ${{ startsWith(github.ref, 'refs/tags/v') && '1' || '0' }}
+        run: python packaging/build.py
+
+      - name: Package artifact (zip)
+        shell: bash
+        run: |
+          cd dist
+          for d in */ ; do
+            name="${d%/}"
+            if [ "${{ runner.os }}" = "Windows" ]; then
+              7z a "${name}.zip" "${d}" > /dev/null
+            else
+              zip -r "${name}.zip" "${d}" > /dev/null
+            fi
+          done
+
+      - name: Upload artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: AssemblyLineLauncher-${{ matrix.platform_name }}
+          path: dist/*.zip
+          if-no-files-found: error
+
+  release:
+    name: Publish release
+    needs: build
+    if: startsWith(github.ref, 'refs/tags/v')
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - name: Download all artifacts
+        uses: actions/download-artifact@v4
+        with:
+          path: artifacts
+
+      - name: Create GitHub release
+        uses: softprops/action-gh-release@v2
+        with:
+          files: artifacts/**/*.zip
+          generate_release_notes: true

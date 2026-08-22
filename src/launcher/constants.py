@@ -37,7 +37,7 @@ USER_AGENT = "Pavle012/assembly-line-launcher/0.1.0 (github.com/Pavle012)"
 # you can register one (see docs/MICROSOFT_AUTH_SETUP.md). This is the only
 # line that needs to change to do that.
 # --------------------------------------------------------------------------
-MS_CLIENT_ID = "c36a9fb6-4f2a-41ff-90bd-ae7cc92031eb"
+MS_CLIENT_ID = "0fa03691-5074-4856-907e-c7db32d9e444"
 
 MS_DEVICE_CODE_URL = (
     "https://login.microsoftonline.com/consumers/oauth2/v2.0/devicecode"

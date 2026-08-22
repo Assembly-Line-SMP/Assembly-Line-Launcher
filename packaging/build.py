@@ -75,6 +75,8 @@ def build() -> int:
         "--company-name=Pavle012",
         "--product-name=Assembly Line Launcher",
         "--file-description=Launcher for the Assembly Line SMP",
+        "--file-version=1.0.0.0",
+        "--product-version=1.0.0.0",
         "--remove-output",
         f"--lto={'yes' if use_lto else 'no'}",
     ]

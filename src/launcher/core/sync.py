@@ -82,7 +82,11 @@ def sync_instance(
     java_major = required_java_major(manifest.dependencies.minecraft_version)
     java_binary = ensure_java(java_major, progress=progress)
 
-    install_vanilla_version(manifest.dependencies.minecraft_version, progress=progress)
+    install_vanilla_version(
+        manifest.dependencies.minecraft_version,
+        progress=progress,
+        minecraft_root=instance.minecraft_dir,
+    )
     install_loader(
         manifest.dependencies.loader_id,
         manifest.dependencies.minecraft_version,

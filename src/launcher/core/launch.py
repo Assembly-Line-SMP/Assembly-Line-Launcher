@@ -173,7 +173,9 @@ def launch_instance(
     fire-and-forget can omit it.
     """
     meta = instance.metadata
-    vanilla = install_vanilla_version(meta.minecraft_version)
+    vanilla = install_vanilla_version(
+        meta.minecraft_version, minecraft_root=instance.minecraft_dir
+    )
     loader = install_loader(
         meta.loader_id, meta.minecraft_version, meta.loader_version, instance.path, java_binary
     )

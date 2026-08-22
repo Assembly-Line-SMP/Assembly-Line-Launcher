@@ -201,7 +201,10 @@ def _asset_download_tasks(
 
 
 def install_vanilla_version(
-    version_id: str, *, progress: ProgressCallback | None = None
+    version_id: str,
+    *,
+    progress: ProgressCallback | None = None,
+    minecraft_root: Path | None = None,
 ) -> VanillaVersionInfo:
     """Ensure the vanilla client jar, all required libraries, natives, and
     the asset index/objects for ``version_id`` are present in the shared
@@ -259,6 +262,13 @@ def install_vanilla_version(
     )
     download_many(all_tasks, progress=progress)
     _extract_natives(native_extractions)
+
+    if minecraft_root is not None:
+        profile_dir = minecraft_root / "versions" / version_id
+        profile_dir.mkdir(parents=True, exist_ok=True)
+        (profile_dir / f"{version_id}.json").write_text(
+            json.dumps(meta), encoding="utf-8"
+        )
 
     return VanillaVersionInfo(
         version_id=version_id,

@@ -124,6 +124,8 @@ def build_launch_command(
         "classpath": _classpath_separator().join(classpath),
         "classpath_separator": _classpath_separator(),
         "library_directory": str(libraries_dir()),
+        "resolution_width": str(settings.window_width),
+        "resolution_height": str(settings.window_height),
     }
 
     argv: list[str] = [str(java_binary)]
@@ -167,8 +169,6 @@ def build_launch_command(
     if loader.extra_game_arguments:
         argv.extend(_flatten_modern_args(loader.extra_game_arguments, values))
 
-    argv.extend(["--width", str(settings.window_width)])
-    argv.extend(["--height", str(settings.window_height)])
     if settings.fullscreen:
         argv.append("--fullscreen")
 

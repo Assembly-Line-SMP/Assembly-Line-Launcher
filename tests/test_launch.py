@@ -28,7 +28,11 @@ def test_launch_uses_minecraft_version_for_version_name(tmp_path):
         asset_index_id="17",
         assets_dir=tmp_path / "assets",
         minecraft_arguments=None,
-        game_arguments=["--version", "${version_name}"],
+        game_arguments=[
+            "--version", "${version_name}",
+            "--width", "${resolution_width}",
+            "--height", "${resolution_height}",
+        ],
     )
     loader = LoaderProfile(
         main_class="cpw.mods.bootstraplauncher.BootstrapLauncher",
@@ -50,6 +54,10 @@ def test_launch_uses_minecraft_version_for_version_name(tmp_path):
 
     assert command[command.index("--version") + 1] == "1.21.1"
     assert "-Dminecraft.api.auth.host=https://nope.invalid" in command
+    assert command.count("--width") == 1
+    assert command[command.index("--width") + 1] == "1280"
+    assert command.count("--height") == 1
+    assert command[command.index("--height") + 1] == "720"
 
 
 def test_neoforge_launch_includes_loader_target_arguments(tmp_path):

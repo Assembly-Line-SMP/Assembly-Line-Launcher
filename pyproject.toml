@@ -1,6 +1,6 @@
 [project]
 name = "assembly-line-launcher"
-version = "0.1.0"
+version = "0.1.1"
 description = "Custom Minecraft launcher for the Assembly Line SMP (Modrinth), supporting cracked and premium accounts"
 readme = "README.md"
 requires-python = ">=3.11"

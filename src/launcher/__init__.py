@@ -6,5 +6,5 @@ premium (Microsoft) accounts, side-by-side, with automatic modpack sync
 from Modrinth and automatic Java runtime management.
 """
 
-__version__ = "0.1.0"
+__version__ = "0.1.1"
 __app_name__ = "Assembly Line Launcher"

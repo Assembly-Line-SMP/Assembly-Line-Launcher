@@ -86,6 +86,14 @@ def build_launch_command(
     account: Account,
     settings: LaunchSettings,
 ) -> list[str]:
+    if loader.profile_id and loader.profile_id.lower().startswith(("neoforge-", "forge-")):
+        loader_arguments = _flatten_modern_args(loader.extra_game_arguments, {})
+        if "--launchTarget" not in loader_arguments:
+            raise LaunchError(
+                f"Loader profile {loader.profile_id} is incomplete: missing "
+                "--launchTarget. Reinstall the mod loader for this instance."
+            )
+
     classpath_entries = [str(vanilla.client_jar)] + [str(p) for p in vanilla.libraries] + [
         str(p) for p in loader.extra_classpath
     ]

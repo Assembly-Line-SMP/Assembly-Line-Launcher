@@ -60,6 +60,14 @@ def sync_instance(
         and existing.metadata.modrinth_version_id == version.id
     )
 
+    if already_current and existing is not None:
+        java_binary = ensure_java(existing.metadata.java_major, progress=progress)
+        return SyncResult(
+            instance=existing,
+            java_binary=str(java_binary),
+            updated=False,
+        )
+
     instance_path = instance_manager.get_or_create_path(DEFAULT_INSTANCE_ID)
     placeholder_metadata = InstanceMetadata(
         id=DEFAULT_INSTANCE_ID,

@@ -132,12 +132,12 @@ class MainWindow(QMainWindow):
         self.title_label.setText(project.title)
 
     def _on_versions_loaded(self, versions: list[ModrinthVersion]) -> None:
-        self._versions = versions
+        self._versions = versions[:1]
         self.version_combo.clear()
-        for v in versions:
+        for v in self._versions:
             self.version_combo.addItem(f"{v.version_number} ({v.name})", v.id)
-        if versions:
-            self.subtitle_label.setText(f"{len(versions)} version(s) available")
+        if self._versions:
+            self.subtitle_label.setText(f"Latest version: {self._versions[0].version_number}")
         else:
             self.subtitle_label.setText("No installable versions found.")
 
@@ -198,6 +198,19 @@ class MainWindow(QMainWindow):
         if self.account_manager.active_account is None:
             QMessageBox.warning(self, "No Account", "Add and select an account first.")
             return
+
+        existing = sync_module.InstanceManager().get(sync_module.DEFAULT_INSTANCE_ID)
+        if existing and existing.metadata.modrinth_version_id != version.id:
+            answer = QMessageBox.question(
+                self,
+                "Modpack Update Available",
+                f"Update the modpack from {existing.metadata.modrinth_version_number} "
+                f"to {version.version_number} before launching?",
+                QMessageBox.StandardButton.Yes | QMessageBox.StandardButton.No,
+                QMessageBox.StandardButton.Yes,
+            )
+            if answer != QMessageBox.StandardButton.Yes:
+                return
 
         self.play_button.setEnabled(False)
         self.progress_bar.setVisible(True)

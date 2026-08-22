@@ -19,8 +19,8 @@ with [Nuitka](https://nuitka.net/) via GitHub Actions.
 - **Premium accounts**: real Microsoft sign-in via the OAuth device-code
   flow (no password ever touches this launcher — you sign in through
   Microsoft's own page).
-- **Live modpack sync**: fetches the latest (or a chosen) version directly
-  from the Modrinth API, downloads only what's missing or changed.
+- **Live modpack sync**: fetches the latest version directly from the
+  Modrinth API and asks for confirmation before applying an update.
 - **Automatic Java provisioning**: downloads the correct Eclipse Temurin
   JRE version for whatever the modpack needs — you never have to install
   Java yourself.
@@ -44,7 +44,11 @@ pip install -r requirements-dev.txt
 python packaging/build.py
 ```
 
-Output goes to `dist/AssemblyLineLauncher-<platform>/`. Set the
+The build creates a native installer in `dist/`: an Inno Setup `.exe` on
+Windows, an `.AppImage` on Linux, and a `.dmg` on macOS. Linux builds require
+`appimagetool`; Windows builds require Inno Setup (`ISCC`) on `PATH`.
+The standalone distribution directory is also kept at
+`dist/AssemblyLineLauncher-<platform>/`. Set the
 `LAUNCHER_BUILD_LTO=1` environment variable to enable link-time
 optimization for a smaller/faster binary at the cost of a much longer
 build (this is what tagged release builds in CI use).

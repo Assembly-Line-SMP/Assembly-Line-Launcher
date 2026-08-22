@@ -158,10 +158,18 @@ def ensure_java(
         destination=archive_path,
         label=f"Java {java_major} runtime",
     )
-    download_file(task, progress=progress)
-
     try:
+        download_file(task, progress=progress, force=True)
+        if not archive_path.is_file():
+            raise JavaProvisioningError(
+                f"Java {java_major} download completed without creating "
+                f"the archive {archive_path.name}."
+            )
         _extract_archive(archive_path, install_root)
+    except (OSError, tarfile.TarError, zipfile.BadZipFile) as exc:
+        raise JavaProvisioningError(
+            f"Could not install the downloaded Java {java_major} runtime: {exc}"
+        ) from exc
     finally:
         archive_path.unlink(missing_ok=True)
 

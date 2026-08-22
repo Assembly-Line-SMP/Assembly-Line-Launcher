@@ -154,12 +154,12 @@ def _run_installer(
         progress=progress,
     )
 
-    mc_root = instance_root / ".minecraft"
+    mc_root = instance_root / "minecraft"
     mc_root.mkdir(parents=True, exist_ok=True)
 
     logger.info("Running loader installer: %s", installer_filename)
     result = subprocess.run(  # noqa: S603
-        [str(java_binary), "-jar", str(installer_path), "--installClient", str(mc_root)],
+        [str(java_binary), "-jar", str(installer_path), "--install-client", str(mc_root)],
         cwd=str(mc_root),
         capture_output=True,
         text=True,
@@ -170,7 +170,7 @@ def _run_installer(
         logger.error("Installer stderr: %s", result.stderr)
         raise LoaderInstallError(
             f"{installer_filename} failed to install (exit code {result.returncode}). "
-            "See logs for installer output."
+            f"Installer output: {(result.stderr or result.stdout).strip()[-2000:]}"
         )
 
     versions_dir = mc_root / "versions"

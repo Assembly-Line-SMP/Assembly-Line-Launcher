@@ -1,3 +1,4 @@
+import json
 from pathlib import Path
 
 from launcher.core.loader_installer import _run_installer
@@ -8,7 +9,16 @@ def test_existing_loader_profile_skips_installer(tmp_path, monkeypatch):
     profile = minecraft_root / "versions" / "neoforge-21.1.248"
     profile.mkdir(parents=True)
     profile_path = profile / "neoforge-21.1.248.json"
-    profile_path.write_text("{}", encoding="utf-8")
+    profile_path.write_text(
+        json.dumps(
+            {
+                "arguments": {
+                    "game": ["--fml.mcVersion", "1.21.1", "--launchTarget", "forgeclient"]
+                }
+            }
+        ),
+        encoding="utf-8",
+    )
 
     def fail_download(*args, **kwargs):
         raise AssertionError("cached loader profile should skip downloading")

@@ -156,6 +156,9 @@ def _run_installer(
 
     mc_root = instance_root / "minecraft"
     mc_root.mkdir(parents=True, exist_ok=True)
+    launcher_profiles = mc_root / "launcher_profiles.json"
+    if not launcher_profiles.exists():
+        launcher_profiles.write_text(json.dumps({"profiles": {}}), encoding="utf-8")
 
     logger.info("Running loader installer: %s", installer_filename)
     result = subprocess.run(  # noqa: S603

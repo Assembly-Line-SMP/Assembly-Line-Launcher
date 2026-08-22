@@ -157,6 +157,7 @@ def _run_installer(
         if "forge" in path.stem.lower()
         and installer_filename.removesuffix("-installer.jar").lower()
         in path.stem.lower()
+        and _profile_has_loader_arguments(path)
     ] if versions_dir.exists() else []
     if generated_profiles:
         return sorted(generated_profiles)[-1]
@@ -194,10 +195,24 @@ def _run_installer(
         raise LoaderInstallError(
             f"{installer_filename} reported success but no version JSON was found."
         )
+    generated = [c for c in candidates if "forge" in c.stem.lower()]
+    generated = [c for c in generated if _profile_has_loader_arguments(c)]
+    if not generated:
+        raise LoaderInstallError(
+            f"{installer_filename} installed without the required loader launch arguments."
+        )
     # The installer-generated profile is the one that isn't the plain
     # vanilla version id (it has "forge"/"neoforge" in its id).
-    generated = [c for c in candidates if "forge" in c.stem.lower()]
     return (generated or candidates)[0]
+
+
+def _profile_has_loader_arguments(path: Path) -> bool:
+    try:
+        data = json.loads(path.read_text(encoding="utf-8"))
+        game_arguments = data.get("arguments", {}).get("game", [])
+        return "--launchTarget" in game_arguments and "--fml.mcVersion" in game_arguments
+    except (OSError, json.JSONDecodeError, TypeError):
+        return False
 
 
 def _read_installer_generated_profile(version_json_path: Path) -> LoaderProfile:

@@ -88,10 +88,10 @@ def build_launch_command(
 ) -> list[str]:
     if loader.profile_id and loader.profile_id.lower().startswith(("neoforge-", "forge-")):
         loader_arguments = _flatten_modern_args(loader.extra_game_arguments, {})
-        if "--launchTarget" not in loader_arguments:
+        if "--launchTarget" not in loader_arguments or "--fml.mcVersion" not in loader_arguments:
             raise LaunchError(
                 f"Loader profile {loader.profile_id} is incomplete: missing "
-                "--launchTarget. Reinstall the mod loader for this instance."
+                "NeoForge launch arguments. Reinstall the mod loader for this instance."
             )
 
     classpath_entries = [str(vanilla.client_jar)] + [str(p) for p in vanilla.libraries] + [
@@ -203,7 +203,24 @@ def launch_instance(
         raise LaunchError(f"Account {account.username} has no valid access token.")
 
     argv = build_launch_command(java_binary, instance, vanilla, loader, account, settings)
-    logger.info("Launching: %s ... (%d args)", " ".join(argv[:3]), len(argv))
+    if meta.loader_id == "neoforge":
+        required_loader_flags = {
+            "--fml.neoForgeVersion",
+            "--fml.fmlVersion",
+            "--fml.mcVersion",
+            "--fml.neoFormVersion",
+            "--launchTarget",
+        }
+        missing_loader_flags = sorted(
+            flag for flag in required_loader_flags if flag not in argv
+        )
+        if missing_loader_flags:
+            raise LaunchError(
+                "NeoForge launch command is incomplete; missing: "
+                + ", ".join(missing_loader_flags)
+                + ". Rebuild or reinstall the launcher profile."
+            )
+    logger.info("Launching command (%d args): %s", len(argv), " ".join(argv))
 
     env = os.environ.copy()
     process = subprocess.Popen(  # noqa: S603

@@ -33,7 +33,7 @@ def test_launch_uses_minecraft_version_for_version_name(tmp_path):
     loader = LoaderProfile(
         main_class="cpw.mods.bootstraplauncher.BootstrapLauncher",
         extra_classpath=[],
-        extra_game_arguments=["--launchTarget", "forgeclient"],
+        extra_game_arguments=["--launchTarget", "forgeclient", "--fml.mcVersion", "1.21.1"],
         extra_jvm_arguments=[],
         profile_id="neoforge-21.1.248",
     )

@@ -146,14 +146,6 @@ def _run_installer(
     mode against a private "mc install root" inside the instance, then
     returns the path to the generated version JSON.
     """
-    from launcher.util.paths import cache_dir
-
-    installer_path = cache_dir() / "installers" / installer_filename
-    download_file(
-        DownloadTask(url=installer_url, destination=installer_path, label=installer_filename),
-        progress=progress,
-    )
-
     mc_root = instance_root / "minecraft"
     mc_root.mkdir(parents=True, exist_ok=True)
 
@@ -167,6 +159,14 @@ def _run_installer(
     ] if versions_dir.exists() else []
     if generated_profiles:
         return sorted(generated_profiles)[-1]
+
+    from launcher.util.paths import cache_dir
+
+    installer_path = cache_dir() / "installers" / installer_filename
+    download_file(
+        DownloadTask(url=installer_url, destination=installer_path, label=installer_filename),
+        progress=progress,
+    )
 
     launcher_profiles = mc_root / "launcher_profiles.json"
     if not launcher_profiles.exists():

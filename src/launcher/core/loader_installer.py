@@ -48,6 +48,7 @@ class LoaderProfile:
     extra_classpath: list[Path]
     extra_game_arguments: list[Any]
     extra_jvm_arguments: list[Any]
+    profile_id: str | None = None
 
 
 def _client() -> httpx.Client:
@@ -236,6 +237,7 @@ def _read_installer_generated_profile(version_json_path: Path) -> LoaderProfile:
         extra_classpath=classpath,
         extra_game_arguments=data.get("arguments", {}).get("game", []),
         extra_jvm_arguments=data.get("arguments", {}).get("jvm", []),
+        profile_id=data.get("id", version_json_path.stem),
     )
 
 

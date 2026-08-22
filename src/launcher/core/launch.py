@@ -100,7 +100,7 @@ def build_launch_command(
 
     values = {
         "auth_player_name": account.username,
-        "version_name": vanilla.version_id,
+        "version_name": loader.profile_id or vanilla.version_id,
         "game_directory": str(instance.minecraft_dir),
         "assets_root": str(vanilla.assets_dir),
         "assets_index_name": vanilla.asset_index_id,

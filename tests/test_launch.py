@@ -35,6 +35,7 @@ def test_launch_uses_minecraft_version_for_version_name(tmp_path):
         extra_classpath=[],
         extra_game_arguments=[],
         extra_jvm_arguments=[],
+        profile_id="neoforge-21.1.248",
     )
     account = Account(
         id="account",
@@ -47,4 +48,4 @@ def test_launch_uses_minecraft_version_for_version_name(tmp_path):
         Path("java"), instance, vanilla, loader, account, LaunchSettings()
     )
 
-    assert command[command.index("--version") + 1] == "1.21.1"
+    assert command[command.index("--version") + 1] == "neoforge-21.1.248"

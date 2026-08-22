@@ -30,6 +30,30 @@ DIST_DIR = ROOT / "dist"
 
 APP_NAME = "AssemblyLineLauncher"
 
+APPIMAGE_ICON = """/* XPM */
+static char *assembly_line_launcher[] = {
+"16 16 2 1",
+"  c None",
+"X c #d97706",
+"                ",
+"       XX       ",
+"      XXXX      ",
+"     XXXXXX     ",
+"    XXXXXXXX    ",
+"   XXXXXXXXXX   ",
+"  XXXXXXXXXXXX  ",
+" XXXXXXXXXXXXXX ",
+"XXXXXXXXXXXXXXXX",
+" XXXXXXXXXXXXXX ",
+"  XXXXXXXXXXXX  ",
+"   XXXXXXXXXX   ",
+"    XXXXXXXX    ",
+"     XXXXXX     ",
+"      XXXX      ",
+"       XX       ",
+"                "};
+"""
+
 
 def _platform_suffix() -> str:
     system = platform.system().lower()
@@ -153,6 +177,9 @@ def _package_installer() -> int:
             shutil.rmtree(appdir)
         appdir.mkdir()
         shutil.copytree(distribution, appdir / "usr" / "bin")
+        (appdir / "assembly-line-launcher.xpm").write_text(
+            APPIMAGE_ICON, encoding="utf-8"
+        )
         (appdir / "AppRun").write_text(
             f"#!/bin/sh\nexec \"$APPDIR/usr/bin/{APP_NAME}\" \"$@\"\n",
             encoding="utf-8",
@@ -164,6 +191,7 @@ def _package_installer() -> int:
             "Type=Application\n"
             "Name=Assembly Line Launcher\n"
             "Exec=AssemblyLineLauncher\n"
+            "Icon=assembly-line-launcher\n"
             "Categories=Game;\n",
             encoding="utf-8",
         )

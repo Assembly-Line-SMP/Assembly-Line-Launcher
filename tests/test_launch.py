@@ -48,7 +48,8 @@ def test_launch_uses_minecraft_version_for_version_name(tmp_path):
         Path("java"), instance, vanilla, loader, account, LaunchSettings()
     )
 
-    assert command[command.index("--version") + 1] == "neoforge-21.1.248"
+    assert command[command.index("--version") + 1] == "1.21.1"
+    assert "-Dminecraft.api.auth.host=https://nope.invalid" in command
 
 
 def test_neoforge_launch_includes_loader_target_arguments(tmp_path):
@@ -79,7 +80,9 @@ def test_neoforge_launch_includes_loader_target_arguments(tmp_path):
         extra_classpath=[],
         extra_game_arguments=[
             "--fml.neoForgeVersion", "21.1.248",
+            "--fml.fmlVersion", "4.0.43",
             "--fml.mcVersion", "1.21.1",
+            "--fml.neoFormVersion", "20240808.144430",
             "--launchTarget", "forgeclient",
         ],
         extra_jvm_arguments=[],
@@ -98,3 +101,4 @@ def test_neoforge_launch_includes_loader_target_arguments(tmp_path):
 
     assert command[command.index("--launchTarget") + 1] == "forgeclient"
     assert command[command.index("--fml.mcVersion") + 1] == "1.21.1"
+    assert command[command.index("--fml.neoForgeVersion") + 1] == "21.1.248"

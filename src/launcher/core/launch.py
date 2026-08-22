@@ -108,7 +108,7 @@ def build_launch_command(
 
     values = {
         "auth_player_name": account.username,
-        "version_name": loader.profile_id or vanilla.version_id,
+        "version_name": vanilla.version_id,
         "game_directory": str(instance.minecraft_dir),
         "assets_root": str(vanilla.assets_dir),
         "assets_index_name": vanilla.asset_index_id,
@@ -128,6 +128,15 @@ def build_launch_command(
 
     argv: list[str] = [str(java_binary)]
 
+    argv.extend(
+        [
+            "-Duser.language=en",
+            "-Dminecraft.api.auth.host=https://nope.invalid",
+            "-Dminecraft.api.account.host=https://nope.invalid",
+            "-Dminecraft.api.session.host=https://nope.invalid",
+            "-Dminecraft.api.services.host=https://nope.invalid",
+        ]
+    )
     argv.append(f"-Xms{settings.min_memory_mb}M")
     argv.append(f"-Xmx{settings.max_memory_mb}M")
     if settings.extra_jvm_args:

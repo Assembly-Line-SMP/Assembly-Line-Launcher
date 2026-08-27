@@ -131,9 +131,12 @@ def build_launch_command(
                     if path_str.endswith(".jar"):
                         module_path_jars.add(Path(path_str).name)
 
-    classpath_entries = [str(vanilla.client_jar)] + [str(p) for p in vanilla.libraries] + [
+    classpath_entries = [str(p) for p in vanilla.libraries] + [
         str(p) for p in loader.extra_classpath
     ]
+    if not is_forge_like:
+        classpath_entries.insert(0, str(vanilla.client_jar))
+
     # De-duplicate while preserving order, and filter out module-path jars.
     seen: set[str] = set()
     classpath = []

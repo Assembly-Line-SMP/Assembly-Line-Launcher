@@ -106,6 +106,9 @@ def build_launch_command(
             seen.add(entry)
             classpath.append(entry)
 
+    is_forge_like = loader.profile_id and loader.profile_id.lower().startswith(("neoforge-", "forge-"))
+    lib_dir = instance.minecraft_dir / "libraries" if is_forge_like else libraries_dir()
+
     values = {
         "auth_player_name": account.username,
         "version_name": vanilla.version_id,
@@ -123,7 +126,7 @@ def build_launch_command(
         "launcher_version": "0.1.0",
         "classpath": _classpath_separator().join(classpath),
         "classpath_separator": _classpath_separator(),
-        "library_directory": str(libraries_dir()),
+        "library_directory": str(lib_dir),
         "resolution_width": str(settings.window_width),
         "resolution_height": str(settings.window_height),
     }

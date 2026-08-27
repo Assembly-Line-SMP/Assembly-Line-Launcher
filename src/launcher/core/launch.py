@@ -94,21 +94,10 @@ def build_launch_command(
                 "NeoForge launch arguments. Reinstall the mod loader for this instance."
             )
 
-    classpath_entries = [str(vanilla.client_jar)] + [str(p) for p in vanilla.libraries] + [
-        str(p) for p in loader.extra_classpath
-    ]
-    # De-duplicate while preserving order (loader profiles sometimes
-    # re-list a vanilla library that's already present).
-    seen: set[str] = set()
-    classpath = []
-    for entry in classpath_entries:
-        if entry not in seen:
-            seen.add(entry)
-            classpath.append(entry)
-
     is_forge_like = loader.profile_id and loader.profile_id.lower().startswith(("neoforge-", "forge-"))
     lib_dir = instance.minecraft_dir / "libraries" if is_forge_like else libraries_dir()
 
+    # Build values with a placeholder classpath first so we can resolve JVM arguments
     values = {
         "auth_player_name": account.username,
         "version_name": vanilla.version_id,
@@ -124,12 +113,39 @@ def build_launch_command(
         "natives_directory": str(vanilla.natives_dir),
         "launcher_name": "AssemblyLineLauncher",
         "launcher_version": "0.1.0",
-        "classpath": _classpath_separator().join(classpath),
+        "classpath": "",
         "classpath_separator": _classpath_separator(),
         "library_directory": str(lib_dir),
         "resolution_width": str(settings.window_width),
         "resolution_height": str(settings.window_height),
     }
+
+    # Evaluate JVM arguments early to identify any jars placed on the module path
+    jvm_arg_source = loader.extra_jvm_arguments or vanilla.jvm_arguments
+    module_path_jars = set()
+    if jvm_arg_source:
+        flat_jvm_args = _flatten_modern_args(jvm_arg_source, values)
+        for i, arg in enumerate(flat_jvm_args):
+            if arg in ("-p", "--module-path") and i + 1 < len(flat_jvm_args):
+                for path_str in flat_jvm_args[i + 1].split(_classpath_separator()):
+                    if path_str.endswith(".jar"):
+                        module_path_jars.add(Path(path_str).name)
+
+    classpath_entries = [str(vanilla.client_jar)] + [str(p) for p in vanilla.libraries] + [
+        str(p) for p in loader.extra_classpath
+    ]
+    # De-duplicate while preserving order, and filter out module-path jars.
+    seen: set[str] = set()
+    classpath = []
+    for entry in classpath_entries:
+        if Path(entry).name in module_path_jars:
+            continue
+        if entry not in seen:
+            seen.add(entry)
+            classpath.append(entry)
+
+    # Set the finalized classpath
+    values["classpath"] = _classpath_separator().join(classpath)
 
     argv: list[str] = [str(java_binary)]
 

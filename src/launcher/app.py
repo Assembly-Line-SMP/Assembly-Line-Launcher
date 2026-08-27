@@ -18,13 +18,14 @@ def main() -> int:
 
     from PySide6.QtWidgets import QApplication
 
-    from launcher import __app_name__, __version__
+    from launcher import __app_name__, __build__, __version__
     from launcher.ui.main_window import MainWindow
 
     app = QApplication(sys.argv)
     app.setApplicationName(__app_name__)
     app.setApplicationVersion(__version__)
     app.setOrganizationName("Pavle012")
+    logger.info("Launcher build: %s", __build__)
 
     window = MainWindow()
     window.show()

@@ -8,3 +8,4 @@ from Modrinth and automatic Java runtime management.
 
 __version__ = "0.1.2"
 __app_name__ = "Assembly Line Launcher"
+__build__ = "launch-args-fixed"

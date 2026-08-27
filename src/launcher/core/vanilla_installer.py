@@ -70,6 +70,20 @@ def _rule_applies(rule: dict[str, Any]) -> bool:
         name = os_rule.get("name")
         if name and name != _current_os_name():
             return not action_allow
+
+    features_rule = rule.get("features")
+    if features_rule:
+        active_features = {
+            "has_custom_resolution": True,
+            "is_demo_user": False,
+            "has_quick_play_singleplayer": False,
+            "has_quick_play_multiplayer": False,
+            "has_quick_play_realms": False,
+        }
+        for feature_name, expected_val in features_rule.items():
+            if active_features.get(feature_name, False) != expected_val:
+                return not action_allow
+
     return action_allow
 
 
